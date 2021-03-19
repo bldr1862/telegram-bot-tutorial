@@ -1,6 +1,6 @@
 import logging
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import random
 
@@ -22,6 +22,16 @@ def random_number(update, context):
     number = random.randint(0,1000)
     context.bot.sendMessage(chat_id=user_id, parse_mode="HTML", text=f"Número aleatorio: {number}")
 
+def echo(update, context):
+    user_id = update.effective_user['id']
+    logger.info(f"El usuario {user_id}, ha enviado un mensaje de texto.")
+    text = update.message.text
+    context.bot.sendMessage(
+        chat_id=user_id,
+        parse_mode="MarkdownV2",
+        text=f"*Escribiste:*\n_{text}_"
+    )
+
 
 if __name__ == "__main__":
     # Obtenemos informacion de nuestro bot
@@ -37,6 +47,8 @@ if __name__ == "__main__":
     # Creamos los manejadores
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("random", random_number))
+    dp.add_handler(CommandHandler("random", random_number))
+    dp.add_handler(MessageHandler(Filters.text, echo))
 
     # Start loop
     updater.start_polling()
